@@ -342,6 +342,11 @@ adat %>%
   ylab("NDVI") +
   ylim(0.2, 0.9)
 
+```
+
+Now let's fit the model and plot the model fit (blue) over the observed data (black circles).
+
+```{r, echo = F, message=FALSE, warning=FALSE}
 
 ###Loop through sites fitting the model
 
@@ -349,7 +354,7 @@ adat %>%
 sitnms <- unique(adat$site)
 
 # Set initial parameters
-par <- c(alpha = 0.2, gamma = 0.4, lambda = 0.5, A = 0.6, phi = 0)
+par <- c(alpha = 0.2, gamma = 0.4, lambda = 0.5, A = 0.1, phi = -1)
 
 # Make output table
 out <- data.frame(initial = par)
@@ -378,12 +383,31 @@ lines(dat$age, pred.negexpS(fit_negexpMLES$par,dat$age), col = 'skyblue', lwd = 
 # bind to output
 out <- cbind(out, fit_negexpMLES$par)
 }
+```
 
+And view a table of the parameter estimates
+
+```{r, echo = F, message=FALSE, warning=FALSE}
 # tidy and present table
 names(out) <- c("initial", sitnms)
 kable(t(out), digits = 3)
 ```
 
+```{r echo = F, fig.align = 'center', out.width = '95%', fig.cap = "Stylized postfire recovery curve from Slingsby et al. (2020)."}
+knitr::include_graphics("images/recoverycurve.png")
+```
+
+alpha = starting NDVI after a fire (lower stippled line above)
+
+gamma = the difference between alpha and the asymptote of NDVI (i.e. alpha + gamma = estimated steady long-term NDVI (upper stippled line above))
+
+lambda = 1/recovery rate after fire (i.e. the smaller the value the faster the rate of recovery)
+
+A = the magnitude of seasonality (the absolute value indicates the magnitude, ignore the sign (+/-) for now)
+
+phi = ignore
+
+<br>
 
 ## Explore relationship between EF and measures of diversity
 
