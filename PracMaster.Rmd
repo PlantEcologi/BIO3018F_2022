@@ -308,7 +308,7 @@ plot(en)
 
 FD
 
-```{r}
+```{r, echo = F, message=FALSE, warning=FALSE}
 fnmds <- metaMDS(msampBFD, trymax = 999)
 
 plot(fnmds)
@@ -324,8 +324,64 @@ Mike has shown you how to explore soil colour. Feel free to explore and add it i
 
 To explore ecosystem function we looked at the 20-year time series of the Normalized Difference Vegetation Index (NDVI) recorded by the MODIS satellite mission. From these we used the post-fire recovery trajectory modelling framework developed by Wilson et al (2015) to derive estimates of the mean maximum NDVI (alpha + gamma), and the amplitude and timing of seasonality (big alpha and phi) as our measures of ecosystem function. Here I've provided a table of these parameters by site and plots of the model fits. Are the models good fits? Do they miss anything? Is it relevant to the questions we're asking?
 
-```{r}
+```{r, echo = F, message=FALSE, warning=FALSE}
+# source("prac/01_downloadNDVI.R") # this is only run once to download the MODIS data
+source("code/02_plot.NDVI.R")
+source("code/03_negexp_model.R")
 
+###Get data
+adat <- read_csv("data/modis.csv")
+#adat <- adat %>% filter(calendar_date > as.Date("2015-9-14"))
+
+###Plot all timeseries
+adat %>%
+  ggplot(aes(x = calendar_date, y = value*scale)) + 
+  geom_line() +
+#  geom_point() +
+  facet_wrap(.~ site) +
+  ylab("NDVI") +
+  ylim(0.2, 0.9)
+
+
+###Loop through sites fitting the model
+
+# Get site names
+sitnms <- unique(adat$site)
+
+# Set initial parameters
+par <- c(alpha = 0.2, gamma = 0.4, lambda = 0.5, A = 0.6, phi = 0)
+
+# Make output table
+out <- data.frame(initial = par)
+
+par(mfrow=c(2,3))
+
+for(i in 1:length(sitnms)) {
+  
+dat <- adat %>% filter(site == sitnms[i])
+
+# calculate age from date
+dat$age <- (as.numeric(dat$calendar_date) - min(as.numeric(dat$calendar_date), na.rm = T))/365.25
+
+# scale NDVI
+dat$NDVI <- dat$value*dat$scale
+
+# fit models
+fit_negexpMLES <- fit.negexpS.MLE(dat, par)
+
+# plot
+plot.NDVI(dat, ylim = c(0.1, 0.9), main = sitnms[i])
+
+# add curve with MLE parameters
+lines(dat$age, pred.negexpS(fit_negexpMLES$par,dat$age), col = 'skyblue', lwd = 3)
+
+# bind to output
+out <- cbind(out, fit_negexpMLES$par)
+}
+
+# tidy and present table
+names(out) <- c("initial", sitnms)
+kable(t(out), digits = 3)
 ```
 
 
