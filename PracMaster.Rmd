@@ -95,9 +95,11 @@ For this I have just taken the count of species encountered at each point, and t
 library(tidyverse)
 library(readxl)
 library(knitr)
+library(FSA)
+library(picante)
 
 # Read in data
-sdat <- read_xlsx("prac/pracdatasheet.xlsx", sheet = "Species")
+sdat <- read_xlsx("data/pracdatasheet.xlsx", sheet = "Species")
 
 # Select indigenous or invasive species only
 #sdat <- sdat %>% filter(is.na(Alien))
@@ -135,10 +137,9 @@ Here I've estimated Functional Diversity (FD) according to the method of Petchey
 Sites:
 ```{r, echo = F, message=FALSE}
 #library(FD)
-library(picante)
 
 # Read in data
-tdat <- read_xlsx("prac/pracdatasheet.xlsx", sheet = "Traits")
+tdat <- read_xlsx("data/pracdatasheet.xlsx", sheet = "Traits")
 
 # Make a community data matrix for the sites
 samp <- tdat %>%                                    # For sites, lumping all points together 
@@ -249,7 +250,7 @@ Here I provide a table and an ordination of the site-level environmental measure
 
 ```{r, echo = F, message=FALSE}
 # Read in data
-pdat <- read_xlsx("prac/pracdatasheet.xlsx", sheet = "Sites")
+pdat <- read_xlsx("data/pracdatasheet.xlsx", sheet = "Sites")
 names(pdat)
 
 # Make boxplot of any variable
@@ -260,7 +261,6 @@ pdat %>% ggplot() +
 kruskal.test(Dung ~ Site, data = pdat)
 
 # Dunn's Post hoc test to directly explore differences among sites
-library(FSA)
 posthoc <- dunnTest(Dung ~ Site, data = pdat,
               method="bh")
 
