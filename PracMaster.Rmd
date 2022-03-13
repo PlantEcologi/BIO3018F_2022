@@ -23,26 +23,23 @@ The Cape Floristic Region (CFR) of South Africa is one of the most botanically d
 knitr::include_graphics("images/bergh2014.png")
 ```
 
+In this practical, we will explore how variation in a set of measures of biodiversity (species, functional and phylogenetic $\alpha$ and $\beta$ diversity) and environmental conditions relate to a set of metrics of ecosystem function derived from satellite time-series.
 
-[Describe the measures of ecosystem function here... i.e. average and amplitude of seasonality of the Normalized Difference Vegetation Index (NDVI) recorded by the MODIS Terra satellite...]
+The broad questions are:
 
-In this practical, we will explore how variation in a set of measures of biodiversity (species, functional and phylogenetic $\alpha$ and $\beta$ diversity) and environmental conditions relate to a set of metrics of ecosystem function derived from satellite timeseries.
+* Does the variation in environmental conditions potentially explain the observed variation in biodiversity (species and functional $\alpha$ and $\beta$ diversity)?
 
-The questions are:
-
-* Does the variation in environmental conditions potentially explain the observed variation in biodiversity (species, functional and phylogenetic $\alpha$ and $\beta$ diversity)?
-
-* To what degree does the variation in functional and phylogenetic diversity potentially explain the observed variation in our measures of ecosystem function?
+* To what degree does the variation in species and functional diversity potentially explain the observed variation in our measures of ecosystem function?
 
 * What is the relative role of the environment versus biodiversity in determining the observed variation in ecosystem function?
 
-Finally, consider this practical a descriptive study. In your discussion, describe a follow-up study that you would perform to discern cause from correlation and partition the relative influence of environmental conditions versus biodiversity on our measures of ecosystem function.
+* Finally, this practical is a largely descriptive observational study. In your discussion, describe a follow-up study that you would perform to discern cause from correlation and partition the relative influence of environmental conditions versus biodiversity on our measures of ecosystem function.
 
 <br>
 
 # Methods:
 
-The sites are selected to represent contrasting vegetation, but to all be the same (or similar) post-fire age (time since last fire). We will split into 4 teams of 2 or 3. Each pair will survey a point location (towards the corners) within the 250 by 250m MODIS pixel that makes up each site.
+The sites are selected to represent contrasting vegetation, but to all be the same (or similar) post-fire age (time since last fire). We will split into 4 teams of 2 or 3. Each pair will survey a point location (towards the corners) within each of six 250 by 250m MODIS satellite mission pixels that make up our sites.
 
 Each team will need:
 
@@ -63,13 +60,13 @@ At each site, navigate to your team's point location, lay out the two tapes at 9
 
   * Estimate % projected cover (think the area you would see from above) bare soil
 
-  * Take a densiometer reading at ground level. To do this, hold the densiometer level on the soil surface. Pick a spot close to the centre, but try not to pick an obviously open (or closed) patch, it should be representative of the location. To take a reading, split each square into quarters and score them for the amount of light visible - a value from 0 (complete canopy cover) to 4 (no vegetation visible) - counting up these values for all 24 squares (to a maximum of 96), and write this down. We will convert this to canopy cover later, applying the formula $100 - 1.04*X$, where $X$ is your reading.
+  * Take a densiometer reading at ground level. To do this, hold the densiometer level on the soil surface. Pick a spot close to the centre, but try not to pick an obviously open (or closed) patch, it should be representative of the location. To take a reading, count up the number of squares where no vegetation is visible (i.e. sky only) to a maximum of 24 squares, and write this down. We will convert this to canopy cover later, applying the formula $100 - 4.16*X$, where $X$ is your reading.
 
   * Take a **soil sample** (as per Mike's prac, but it can be smaller as we are going to pool the 4 samples per site). These we will process for soil colour and pH as per Mike's prac.
 
   * Do a **dung count**, scoring dung for the point location by the number of quarters where you find dung (i.e. a single score from 0-4 for the point location). Try to avoid scoring obvious single scat ("dung creation") events in more than one quadrat, unless it's an impressive pile.
   
-  * Take a few notes (and photos) on any other features that you think may be important or interesting (slope, rockiness, whatever).
+  * Take a few notes (and photos) on any other features that you think may be important or interesting (slope, rockiness, whatever) to assist you in the write-up.
 
 <br>
 
@@ -81,15 +78,21 @@ At each site, navigate to your team's point location, lay out the two tapes at 9
 
     * Take diagnostic photos for the 5 species (habit (whole plant), leaf, base, flowers and/or fruits).
 
-    * For each of three individuals of your 5 target species, measure the height and collect a shoots for measuring leaf length and leaf width (mark with masking tape and put in sample bag for the site).
+    * For each of three individuals of your 5 target species, measure the height and collect a shoots for measuring leaf length and leaf width (mark with masking tape and put in sample bag labelled for the point location and site).
     
-  * Finally, set a timer and take as many photos of new species (other than your 5 target species) within or near your plot as you can before the alarm goes off. Make sure to take a photo of your site label on your sample bag between sites so you know which photos were collected at which sites. When we get back to base you will upload the photos to folders in the intranet labeled by site.
+  * Finally, set a timer and take as many photos of new species (other than your 5 target species) within or near your plot as you can before the alarm goes off. Make sure to take a photo of your site label on your sample bag between sites so you know which photos were collected at which sites. When we get back to base you will upload the photos to folders in the intranet labeled by site and identify them as far as possible (using morphospecies if needed).
+
+<br>
 
 # Analyses
 
-## Species Diversity
+## Species Alpha Diversity
 
-For this I have just taken the count of species encountered at each point, and the aggregated set of unique species for each site. i.e. no rarefaction etc. Do you think this is an issue for the method we used?
+For this I have just taken the count of species encountered at each point during our rapid photographic surveys, and the aggregated set of unique species for each site (i.e. no rarefaction etc). 
+
+> _Discussion hint: Do you think this is an issue for the method we used? Are there any biases we may have introduced? Justify your answer._
+
+### Sites
 
 ```{r, echo = F, message=FALSE}
 library(tidyverse)
@@ -115,56 +118,90 @@ site_SD <- sdat %>%
 kable(site_SD)
 ```
 
+### Point locations
 
 ```{r, echo = F, message=FALSE}
-#And by point site:
 
-# point_SD <- sdat %>% 
-#   mutate(PointName = paste(Site, Point, sep = "_")) %>%
-#   select(PointName, WorkingName) %>% 
-#   unique() %>%
-#   group_by(PointName) %>%
-#   summarize(`Species Number` = n())
+point_SD <- sdat %>%
+  mutate(PointName = paste(Site, Point, sep = "_")) %>%
+  select(PointName, WorkingName) %>%
+  unique() %>%
+  group_by(PointName) %>%
+  summarize(`Species Number` = n())
 
-#kable(point_SD)
+kable(point_SD)
 ```
 
+<br>
 
-## Functional Diversity
+## Species Beta Diversity
 
-Here I've estimated Functional Diversity (FD) according to the method of Petchey and Gaston (2002) for each of the points, sites and functional turnover between points and between sites using the method of Bryant et al. 2008.
+Here I calculate species beta diversity using Sorenson's coefficient. 
 
-Sites:
+> _Discussion hint: Why can't we do Bray-Curtis? What would we gain if we could?_
+
+### Sites
+
+```{r, echo = F, message=FALSE}
+# make a community data matrix
+site_comm <- sdat %>%
+  mutate(Abundance = 1) %>%
+  select(Site, WorkingName, Abundance) %>%
+  unique() %>%
+  pivot_wider(names_from = WorkingName, 
+              values_from = Abundance,
+              values_fill = 0)
+
+# tomfoolery to set the row names from the first column to get the community data into the desired format for the designdist function
+site_comm <- as.data.frame(unclass(site_comm))
+rownames(site_comm) <- site_comm[,1]
+site_comm <- site_comm[,-1]
+
+site_BD <- designdist(site_comm, method = "(A+B-2*J)/(A+B)", terms = "binary")
+
+# some tomfoolery to present it nicely... (kable() doesn't like class "dist" - i.e. distance objects)
+msite_BD <- as.data.frame(as.matrix(site_BD)) # make it a rectangular table
+msite_BD[upper.tri(msite_BD, diag = T)] <- NA # set the top-right to "NA"
+options(knitr.kable.NA = '') # set the kable() table printing function to make NA values blank
+kable(msite_BD, digits = 3) # print a table
+```
+
+### Point locations
+```{r, echo = F, message=FALSE}
+# make a community data matrix
+point_comm <- sdat %>%
+  mutate(PointName = paste(Site, Point, sep = "_"), Abundance = 1) %>%
+  select(PointName, WorkingName, Abundance) %>%
+  unique() %>%
+  pivot_wider(names_from = WorkingName, 
+              values_from = Abundance,
+              values_fill = 0)
+
+# tomfoolery to set the row names from the first column to get the community data into the desired format for the designdist function
+point_comm <- as.data.frame(unclass(point_comm))
+rownames(point_comm) <- point_comm[,1]
+point_comm <- point_comm[,-1]
+
+point_BD <- designdist(point_comm, method = "(A+B-2*J)/(A+B)", terms = "binary")
+
+# some tomfoolery to present it nicely... (kable() doesn't like class "dist" - i.e. distance objects)
+mpoint_BD <- as.data.frame(as.matrix(point_BD)) # make it a rectangular table
+mpoint_BD[upper.tri(mpoint_BD, diag = T)] <- NA # set the top-right to "NA"
+options(knitr.kable.NA = '') # set the kable() table printing function to make NA values blank
+kable(mpoint_BD, digits = 3) # print a table
+```
+
+<br>
+
+## Functional Alpha Diversity
+
+Here I've estimated Functional Diversity (FD) according to the method of Petchey and Gaston (2002) for each of the points and aggregated sites using only the dominant species for which we measured traits. To apply Petchey and Gaston's method, we first need to estimate a functional dendrogram representing the functional similarity among species based on the traits we measured.
+
 ```{r, echo = F, message=FALSE}
 #library(FD)
 
 # Read in data
 tdat <- read_xlsx("data/pracdatasheet.xlsx", sheet = "Traits")
-
-# Make a community data matrix for the sites
-samp <- tdat %>%                                    # For sites, lumping all points together 
-  mutate(PointName = paste(Site, Point, sep = "_"), # Make a new name column combining Site and Point
-         Abundance = 6-SpeciesNumber) %>%           # Use rankings as "pseudo-abundance", but subtract from 6 to make higher rankings higher abundance
-  select(Site, PointName, FullName, Abundance) %>%  # Select the columns we want
-  unique() %>%                                      # Remove duplicates (there were 3 reps for each species by point)
-  group_by(FullName, Site) %>%                      # For each species within each site...
-  summarize(Abundance = sum(Abundance)) %>%         # ...sum the abundances
-  pivot_wider(names_from = FullName, 
-              values_from = Abundance,
-              values_fill = 0) %>%                  # Turn the 3 columns into a species by site community data matrix
-  na.omit()                                         # Drop and NA entries
-
-
-# Make a community data matrix for the points within sites
-pointsamp <- tdat %>%                               # For points within sites 
-  mutate(PointName = paste(Site, Point, sep = "_"), # Make a new name column combining Site and Point
-         Abundance = 6-SpeciesNumber) %>%           # Use rankings as "pseudo-abundance", but subtract from 6 to make higher rankings higher abundance
-  select(PointName, FullName, Abundance) %>%        # Select the 3 columns we want
-  unique() %>%                                      # Remove duplicates (there were 3 reps for each species by point)
-  pivot_wider(names_from = FullName, 
-              values_from = Abundance,
-              values_fill = 0)  %>%                 # Turn the 3 columns into a species by point community data matrix
-  na.omit()                                         # Drop and NA entries
 
 # Extract species trait means and scale them to mean = 0 and sd = 0
 traits <- tdat %>% 
@@ -186,143 +223,196 @@ tree <- hclust(D,"average")
 # Transform the dendrogram into an object of class 'phylo' (needed for the next step)
 ptree <- as.phylo(tree)
 
-# Finally, calculate the functional diversity for each community - sites and points separately (see ?pd help topic to see how to include or not the root of the dendrogram; the default is to include it).
+# Remove unnecessary objects to keep the workspace tidy
+rm(trt, D, tree)
+
+# Plot the tree to see the relationships among species
+plot(ptree, cex = 0.45)
+```
+
+### FD by Site
+
+```{r, echo = F, message=FALSE}
+# Make a community data matrix for the sites
+samp <- tdat %>%                                    # For sites, lumping all points together 
+  mutate(PointName = paste(Site, Point, sep = "_"), # Make a new name column combining Site and Point
+         Abundance = 6-SpeciesNumber) %>%           # Use rankings as "pseudo-abundance", but subtract from 6 to make higher rankings higher abundance
+  select(Site, PointName, FullName, Abundance) %>%  # Select the columns we want
+  unique() %>%                                      # Remove duplicates (there were 3 reps for each species by point)
+  group_by(FullName, Site) %>%                      # For each species within each site...
+  summarize(Abundance = sum(Abundance)) %>%         # ...sum the abundances
+  pivot_wider(names_from = FullName, 
+              values_from = Abundance,
+              values_fill = 0) %>%                  # Turn the 3 columns into a species by site community data matrix
+  na.omit()                                         # Drop and NA entries
+
+# Calculate the functional diversity for each site - see ?pd for details. Note that while the function was written for phylogenetic diversity, we've used it for functional diversity.
 sampFD <- pd(samp[,-1], ptree)
+
+# Make pretty and print table for sites
 rownames(sampFD) <- samp$Site
 colnames(sampFD)[1] <- "FD"
-
-pointsampFD <- pd(pointsamp[,-1], ptree)
-rownames(pointsampFD) <- pointsamp$PointName
-colnames(pointsampFD)[1] <- "FD"
-
-# print tables
 kable(sampFD, digits = 3)
 
 ```
 
-By point sample:
+### FD by point location:
 
 ```{r, echo = F, message=FALSE}
+# Make a community data matrix for the points within sites
+pointsamp <- tdat %>%                               # For points within sites 
+  mutate(PointName = paste(Site, Point, sep = "_"), # Make a new name column combining Site and Point
+         Abundance = 6-SpeciesNumber) %>%           # Use rankings as "pseudo-abundance", but subtract from 6 to make higher rankings higher abundance
+  select(PointName, FullName, Abundance) %>%        # Select the 3 columns we want
+  unique() %>%                                      # Remove duplicates (there were 3 reps for each species by point)
+  pivot_wider(names_from = FullName, 
+              values_from = Abundance,
+              values_fill = 0)  %>%                 # Turn the 3 columns into a species by point community data matrix
+  na.omit()                                         # Drop and NA entries
+
+# Calculate FD for points
+pointsampFD <- pd(pointsamp[,-1], ptree)
+
+# Make pretty and print table for point locations
+rownames(pointsampFD) <- pointsamp$PointName
+colnames(pointsampFD)[1] <- "FD"
 kable(pointsampFD, digits = 3)
 ```
 
-And functional turnover between sites:
+<br>
+
+## Functional Beta Diversity
+
+I've also estimated functional turnover between sites using the method of Bryant et al. 2008. See help file `?picante::phylosor` in R for details to help know how to interpret. Note that while the function was written for phylogenetic turnover, we've used it for functional turnover.
 
 ```{r, echo = F, message=FALSE}
 # calculate functional turnover between sites
 sampBFD <- phylosor(samp[,-1], ptree)
 
-msampBFD <- as.data.frame(as.matrix(sampBFD)) # some tomfoolery to present it nicely...
+# some tomfoolery to present it nicely... (kable() doesn't like class "dist" - i.e. distance objects)
+msampBFD <- as.data.frame(as.matrix(sampBFD))
 dimnames(msampBFD) <- list(samp$Site, samp$Site)
-
-msampBFDl <- msampBFD
+msampBFDl <- msampBFD # make a new object and keep msampBFD, because you can use it with function metaMDS() 
 msampBFDl[upper.tri(msampBFDl, diag = T)] <- NA
 options(knitr.kable.NA = '') # set table printing function to make NA values blank
 kable(msampBFDl, digits = 3) # print a table
 ```
 
-See help file `?picante::phylosor` in R for details to help know how to interpret. Note that while the function was written for phylogenetic turnover, we've used it for functional turnover.
+What about turnover between point locations?
 
-```{r, echo = F, message=FALSE}
-# library(circlize)
-
-# ?chordDiagram
-```
-
-
-
-```{r, echo = F, message=FALSE}
-## Phylogenetic Diversity
-
-# Here I've estimated Faith's Phylogenetic Diversity (PD; Faith 1991) for each of the sites and phyloSor (Bryant et al. 2008), the phylogenetic turnover between sites.
-
-
-# tree <- read.nexus("prac/Soltis_etal_639taxa_8cploci_rooted.dated.tre")
-
-
-#plot.phylo(tree, type = "radial", cex = 0.25)
-```
-
+<br>
 
 ## Environmental Similarity among sites
 
-Here I provide a table and an ordination of the site-level environmental measurements we took relating to various aspects of soil conditions, canopy coverage and herbivory.
+First, let's calculate % canopy cover from the densiometer readings and then look at site-level averages for most variables.
 
-```{r, echo = F, message=FALSE}
+```{r, echo = F, message=FALSE, warning=FALSE}
 # Read in data
 pdat <- read_xlsx("data/pracdatasheet.xlsx", sheet = "Sites")
 names(pdat)
 
-# Make boxplot of any variable
-pdat %>% ggplot() +
-  geom_boxplot(aes(y = Dung, x = Site))
-
-# Test for significant difference among sites
-kruskal.test(Dung ~ Site, data = pdat)
-
-# Dunn's Post hoc test to directly explore differences among sites
-posthoc <- dunnTest(Dung ~ Site, data = pdat,
-              method="bh")
-
-posthoc
-
-# Map?
-#mapview(Pinus_sf_sub, zcol = "Height_m", cex = 10, layer.name="P. radiata height (m)")
-
-```
-Ordination...
-
-Species...
-
-```{r, echo = F, message=FALSE, warning=FALSE}
-
-set.seed(123) # this allows the result to be reproduced
-
-# tomfoolery to get the community data into the desired format
-comm <- as.data.frame(unclass(samp))
-rownames(comm) <- comm[,1]
-comm <- comm[,-1]
-
-# run NMDS
-nmds <- metaMDS(comm, distance = "bray", k = 2, autotransform =TRUE, trymax = 999)
-
-# Check stress plot
-stressplot(nmds)
+# Convert densiometer readings to canopy cover
+pdat$CanopyCover <- 100 - 4.16*pdat$Densiometer
 
 # Summarize environmental data to site level (i.e. take the average of point measurements)
 env <- pdat %>% 
   group_by(Site) %>%
   summarize(BareSoil = mean(PercentBareSoil), 
-            pH = mean(SoilPH), 
+            `Soil pH` = mean(SoilPH), 
             Dung = mean(Dung),
-            `Canopy Density` = mean(Densiometer))
+            `% Canopy Cover` = mean(CanopyCover))
 
-# Fit the environmental data to the NMDS fit
-en <- envfit(nmds, env, permutations = 999, na.rm = TRUE)
-
-# Plot
-plot(nmds)
-plot(en)
-
+# Print table
+kable(env, digits = 2)
 ```
 
-FD
+Or we can look at environmental similarity among sites
 
 ```{r, echo = F, message=FALSE, warning=FALSE}
-fnmds <- metaMDS(msampBFD, trymax = 999)
+# Use the environmental data to create a distance matrix among sites
+D <- dist(scale(env[,2:5])) # check ?scale - what does this function do and why do you think I used it?
+
+# some tomfoolery to present it nicely... (kable() doesn't like class "dist" - i.e. distance objects)
+edis <- as.data.frame(as.matrix(D))
+dimnames(edis) <- list(env$Site, env$Site)
+edisl <- edis # make a new object and keep edis, because we'll use it later
+edisl[upper.tri(edisl, diag = T)] <- NA
+options(knitr.kable.NA = '') # set table printing function to make NA values blank
+kable(edisl, digits = 3) # print a table
+```
+
+Mike has shown you how to explore soil colour. Feel free to explore and add it in... You may also want to drop or explore subsets of variables to explore different aspects of environmental dissimilarity.
+
+### Plotting
+
+Here's an example of how to make a boxplot of point location measures by site for one variable. You can make a panel of plots if you convert `pdat` into long format using `pivot_longer()` and adding `+ facet_wrap(~name, scales = "free")` to the end of the plotting call (where `name` is whatever you provided for the `names_to =` argument in `pivot_longer()`).
+
+```{r, echo = F, message=FALSE}
+
+# Make boxplot of any variable using point location data
+pdat %>% ggplot() +
+  geom_boxplot(aes(y = CanopyCover, x = Site))
+```
+
+### Test for significant difference among sites 
+
+Here we use the non-parametric Kruskal-Wallis rank sum test.
+
+```{r, echo = F, message=FALSE}
+# Run non-parametric Kruskal-Wallis rank sum test
+kruskal.test(CanopyCover ~ Site, data = pdat)
+```
+
+And use Dunn's posthoc test to explore where the differences lie.
+
+```{r, echo = F, message=FALSE, warning=FALSE}
+# Dunn's Post hoc test to directly explore differences among sites
+posthoc <- dunnTest(CanopyCover ~ Site, data = pdat,
+              method="bh")
+
+kable(posthoc$res, digits = 3)
+```
+
+
+### Ordination
+
+You could also use ordination as you were taught in Timm's prac. I'll leave it to you to check assumptions etc as Hana taught you. Note you have different measures of biodiversity that you can apply at different levels (point location vs site).
+
+#### Using species data at site level
+
+```{r, echo = F, message=FALSE, warning=FALSE}
+# set.seed(123) # this allows the result to be reproduced
+# 
+# # run NMDS
+# nmds <- metaMDS(site_comm, distance = "bray", k = 2, autotransform =TRUE, trymax = 999, trace = FALSE)
+# 
+# # Check stress plot
+# stressplot(nmds)
+# 
+# # Fit the environmental data to the NMDS fit
+# en <- envfit(nmds, env, permutations = 999, na.rm = TRUE)
+# 
+# # Plot
+# plot(nmds)
+# plot(en)
+```
+
+#### Using FD at site level
+
+```{r, echo = F, message=FALSE}
+fnmds <- metaMDS(msampBFD, trymax = 999, trace = FALSE) #note the function works differently when you pass it a distance matrix
+
+# Fit the environmental data to the NMDS fit
+en <- envfit(fnmds, env, permutations = 999, na.rm = TRUE)
 
 plot(fnmds)
 plot(en)
-
-# Try adding the rest yourself...
 ```
 
 
-Mike has shown you how to explore soil colour. Feel free to explore and add it in...
-
 ## Ecosystem function
 
-To explore ecosystem function we looked at the 20-year time series of the Normalized Difference Vegetation Index (NDVI) recorded by the MODIS satellite mission. From these we used the post-fire recovery trajectory modelling framework developed by Wilson et al (2015) to derive estimates of the mean maximum NDVI (alpha + gamma), and the amplitude and timing of seasonality (big alpha and phi) as our measures of ecosystem function. Here I've provided a table of these parameters by site and plots of the model fits. Are the models good fits? Do they miss anything? Is it relevant to the questions we're asking?
+To explore ecosystem function we looked at the 20-year time-series of the Normalized Difference Vegetation Index (NDVI) recorded by the MODIS satellite mission. From these we used the post-fire recovery trajectory modelling framework developed by Wilson et al (2015) to derive estimates of the mean maximum NDVI (alpha + gamma), and the amplitude and timing of seasonality (big alpha and phi) as our measures of ecosystem function. Here I've provided a table of these parameters by site and plots of the model fits. Are the models good fits? Do they miss anything? Is it relevant to the questions we're asking?
 
 ```{r, echo = F, message=FALSE, warning=FALSE}
 # source("prac/01_downloadNDVI.R") # this is only run once to download the MODIS data
@@ -383,6 +473,9 @@ lines(dat$age, pred.negexpS(fit_negexpMLES$par,dat$age), col = 'skyblue', lwd = 
 # bind to output
 out <- cbind(out, fit_negexpMLES$par)
 }
+
+# Remove unnecessary objects to keep the workspace tidy
+rm(i, par)
 ```
 
 And view a table of the parameter estimates
@@ -407,25 +500,51 @@ A = the magnitude of seasonality (the absolute value indicates the magnitude, ig
 
 phi = ignore
 
+> _Discussion hint: Are there any obvious properties of the time-series that are not captured by these parameters? How do they differ between sites and what may the causes be?_
+
+
+### Explore relationships between EF and measures of biodiversity or environmental properties
+
+This practical was a learning exercise and constrained by time and available resources. Perhaps the biggest drawback was the low number of (or lack of replication within) ecosystem types sampled. That said, plotting the relationships between the different site level variables gives us some indication of whether further sampling is likely to produce strong evidence of clear relationships. For this prac write up, I'll forgive you for discussing significant (p < 0.05) or near-significant (p < 0.1) relationships based on a sample size of 6... Usually, this would not be okay...
+
+```{r, echo = F, message=FALSE, warning=FALSE}
+ef <- as.data.frame(t(out))
+ef$Site <- rownames(ef)
+
+dat <- left_join(env, ef)
+
+pairs(dat[,-1])
+
+cor.table(dat[,-1])
+```
+
 <br>
 
-## Explore relationship between EF and measures of diversity
+## Test relationship among distance matrices
 
-- Mantel tests?
-?mantel
+When working with measures of beta diversity you are automatically dealing with distance matrices (i.e. the difference between two or more samples) rather than tables of point estimates (i.e site specific measures of biodiversity etc). A major problem with distance matrices is that each sample is represented more than once (usually the total number of samples minus 1) in the distance matrix, which means that the entries in the distance matrix are not independent. This violates a major assumption of most traditional statistics. For example, one cannot apply a linear model to the graph below. All three points with environmental dissimilarity < 1.75 include the Sand Fynbos site.
 
-## Test relationships using a null model?
+```{r, echo = F, message=FALSE, warning=FALSE}
+plot(as.dist(msampBFD[rownames(edis),colnames(edis)]) ~ as.dist(edis), ylab = "Functional Beta Diversity", xlab = "Environmental dissimilarity")
+```
+
+In this case we need to use methods that can explore correlations among distance matrices. Perhaps the most common of these is Mantel's test, which in this case gives:
+
+```{r, echo = F, message=FALSE, warning=FALSE}
+mantel(msampBFD[rownames(edis),colnames(edis)],edis)
+```
 
 
+# References (papers accessible [at this link](https://paperpile.com/shared/rCBYJb))
 
-# References
+Bergh, Nicola G., G. A. Verboom, Mathieu Rouget, and Richard M. Cowling. 2014. “Vegetation Types of the Greater Cape Floristic Region.” in Fynbos: Ecology, Evolution, and Conservation of a Megadiverse Region. Allsopp et al. (Eds)
 
-Bergh et al
+Mucina, Ladislav, Michael C. Rutherford, and Others. 2006. The Vegetation of South Africa, Lesotho and Swaziland. South African National Biodiversity Institute. https://www.cabdirect.org/cabdirect/abstract/20073221934.
 
-Mucina and Rutherford
+Petchey, Owen L., and Kevin J. Gaston. 2002. “Functional Diversity (FD), Species Richness and Community Composition.” Ecology Letters 5 (3): 402–11. https://doi.org/10.1046/j.1461-0248.2002.00339.x.
 
-Slingsby et al. 2020
+Plas, Fons van der. 2019. “Biodiversity and Ecosystem Functioning in Naturally Assembled Communities.” Biological Reviews of the Cambridge Philosophical Society 94 (4): 1220–45. https://doi.org/10.1111/brv.12499.
 
-van der Plas
+Slingsby, Jasper A., Glenn R. Moncrieff, and Adam M. Wilson. 2020. “Near-Real Time Forecasting and Change Detection for an Open Ecosystem with Complex Natural Dynamics.” ISPRS Journal of Photogrammetry and Remote Sensing.  166 (August): 15–25. https://doi.org/10.1016/j.isprsjprs.2020.05.017.
 
-Wilson et al
+Wilson, Adam M., Andrew M. Latimer, and John A. Silander Jr. 2015. “Climatic Controls on Ecosystem Resilience: Postfire Regeneration in the Cape Floristic Region of South Africa.” Proceedings of the National Academy of Sciences of the United States of America 112 (29): 9058–63. https://doi.org/10.1073/pnas.1416710112.
