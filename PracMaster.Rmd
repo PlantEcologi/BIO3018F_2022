@@ -35,6 +35,8 @@ The broad questions are:
 
 * Finally, this practical is a largely descriptive observational study. In your discussion, describe a follow-up study that you would perform to discern cause from correlation and partition the relative influence of environmental conditions versus biodiversity on our measures of ecosystem function.
 
+Please _DO NOT_ just answer these questions! You are expected to provide a 1500 to 2500 word write up in scientific article format with up to 10 figures and tables (max!). You should address these questions and other hints etc in your write up without breaking the natural flow.
+
 <br>
 
 # Methods:
@@ -93,6 +95,7 @@ For this I have just taken the count of species encountered at each point during
 > _Discussion hint: Do you think this is an issue for the method we used? Are there any biases we may have introduced? Justify your answer._
 
 ### Sites
+(Note! This is currently SE points only! Hash out line 113 `filter(Point == "SE")` when you have full species lists for all point locations.)
 
 ```{r, echo = F, message=FALSE}
 library(tidyverse)
