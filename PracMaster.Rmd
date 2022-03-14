@@ -518,6 +518,90 @@ pairs(dat[,-1])
 cor.table(dat[,-1])
 ```
 
+One could perhaps get around the sample size issue by using a satellite with finer ground sample distance that we could relate to each point location, such as Sentinel 2 (10m GSD vs MODIS 250m). I've extracted and plotted these data below.
+
+```{r, echo = F, message=FALSE, warning=FALSE}
+sent <- read_csv("data/sentinel.csv")
+
+###Plot all timeseries
+sent %>%
+  ggplot(aes(x = calendar_date, y = value*scale)) + 
+  geom_line() +
+  facet_grid(Site ~ Point) +
+  ylab("NDVI")
+```
+
+Unfortunately, as you can see the record is much shorter and there's a lot of variability and big jumps in the NDVI value of the finer resolution instrument. We can still try to fit the model and see what we get though.
+
+```{r, echo = F, message=FALSE, warning=FALSE}
+
+###Loop through site_points fitting the model
+
+# Get joint site_point names
+sitnms <- sort(unique(paste0(sent$Site, "_", sent$Point)))
+sent$site_point <- paste0(sent$Site, "_", sent$Point)
+
+# Set initial parameters
+par <- c(alpha = 0.2, gamma = 0.4, lambda = 0.5, A = 0.1, phi = -1)
+
+# Make output table
+sout <- data.frame(initial = par)
+
+par(mfrow=c(2,3))
+
+for(i in 1:length(sitnms)) {
+  
+dat <- sent %>% filter(site_point == sitnms[i])
+
+# calculate age from date
+dat$age <- (as.numeric(dat$calendar_date) - as.numeric(as.Date("19920101", "%Y%m%d")))/365.25
+
+# scale NDVI
+dat$NDVI <- dat$value*dat$scale
+
+# fit models
+fit_negexpMLES <- fit.negexpS.MLE(dat, par)
+
+# plot
+plot.NDVI(dat, ylim = c(0, 1), main = sitnms[i])
+
+# add curve with MLE parameters
+lines(dat$age, pred.negexpS(fit_negexpMLES$par,dat$age), col = 'skyblue', lwd = 3)
+
+# bind to output
+sout <- cbind(sout, fit_negexpMLES$par)
+}
+
+# Remove unnecessary objects to keep the workspace tidy
+rm(i, par)
+```
+
+Doesn't look too bad...
+
+```{r, echo = F, message=FALSE, warning=FALSE}
+# tidy and present table
+names(sout) <- c("initial", sitnms)
+kable(t(sout), digits = 3)
+```
+
+Hmm... Some of those parameter estimates seem unrealistic. Why?
+
+What do the results look like if we look at correlations for the point-level data?
+
+```{r, echo = F, message=FALSE, warning=FALSE}
+### Join table of parameter estimates with point-level environmental data
+efp <- as.data.frame(t(sout))
+efp$site_point <- rownames(efp)
+pdat$site_point <- paste0(pdat$Site, "_", pdat$Point) # makes a "site_point" column to join by
+ptdat <- left_join(pdat, efp)
+
+# Plot
+pairs(ptdat[,c("PercentBareSoil", "SoilPH", "Dung", "CanopyCover", "alpha", "gamma", "lambda")])
+
+# Test for correlations
+cor.table(ptdat[,c("PercentBareSoil", "SoilPH", "Dung", "CanopyCover", "alpha", "gamma", "lambda")])
+```
+
 <br>
 
 ## Test relationship among distance matrices
