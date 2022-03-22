@@ -95,7 +95,6 @@ For this I have just taken the count of species encountered at each point during
 > _Discussion hint: Do you think this is an issue for the method we used? Are there any biases we may have introduced? Justify your answer._
 
 ### Sites
-(Note! This is currently SE points only! Hash out line 113 `filter(Point == "SE")` when you have full species lists for all point locations.)
 
 ```{r, echo = F, message=FALSE}
 library(tidyverse)
@@ -112,7 +111,7 @@ sdat <- read_xlsx("data/pracdatasheet.xlsx", sheet = "Species")
 #sdat <- sdat %>% filter(Alien == 1)
 
 site_SD <- sdat %>% 
-  filter(Point == "SE") %>% # Select only the SE corner
+#  filter(Point == "SE") %>% # Select only the SE corner
   select(Site, WorkingName) %>% 
   unique() %>%
   group_by(Site) %>%
@@ -193,6 +192,19 @@ mpoint_BD[upper.tri(mpoint_BD, diag = T)] <- NA # set the top-right to "NA"
 options(knitr.kable.NA = '') # set the kable() table printing function to make NA values blank
 kable(mpoint_BD, digits = 3) # print a table
 ```
+
+### Testing for grouping of similarity among points within sites using analysis of variance using distance matrices (ADONIS)
+
+This is a somewhat spurious example, because we'd be surprised if our point samples weren't more similar within than between sites, but the method may be handy for other analyses. see `?adonis` for details.
+
+```{r, echo = F, message=FALSE}
+# split the row names into a dataframe with separate columns for site and point
+group_var <- separate(as.data.frame(row.names(point_comm)), col = 1, into = c("site", "point"), sep = "_")
+
+# run adonis analysis and report results
+adonis2(point_comm ~ site, data = group_var, permutations = 999, method = "bray")
+```
+
 
 <br>
 
